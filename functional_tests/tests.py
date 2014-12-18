@@ -87,6 +87,3 @@ class NewVisitorTest(LiveServerTestCase):
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('Use peacock feathers to make fly', page_text)
-
-        # Both usrs now leave
-        self.browser.quit()
