@@ -1,15 +1,13 @@
 """This document contains functional tests"""
 
 # Imports
-
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
 
-import time
 
-
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     """
        This class defines a functional test for a NewVisitor
     """
@@ -32,7 +30,7 @@ class NewVisitorTest(unittest.TestCase):
         """
 
         # Go to apps homepage
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # Check page title is correct
         self.assertIn('To-Do', self.browser.title)
@@ -74,6 +72,3 @@ class NewVisitorTest(unittest.TestCase):
 
         # Satisfied she goes back to sleep and closes the browser
         self.browser.quit()
-
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
