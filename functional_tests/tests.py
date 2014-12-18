@@ -48,6 +48,8 @@ class NewVisitorTest(LiveServerTestCase):
         # Hits enter, page updates, now page lists "1: Buy peacock feathers"
         # as an item in a to-do list
         inputbox.send_keys(Keys.ENTER)
+        usr1_list_url = self.browser.current_url
+        self.assertRegex(usr1_list_url, '/lists/.+')
         self.check_for_row_in_list_tables('1: Buy peacock feathers')
 
         # Input second item in the to-do list
@@ -59,16 +61,32 @@ class NewVisitorTest(LiveServerTestCase):
         self.check_for_row_in_list_tables(
             '2: Use peacock feathers to make a fly')
 
-        # There is still a texbox to enter another item. She enters "Use
-        # peacock feathers to make a fly"
-        self.fail('Finish the test')
+        # Now a new user, usr2, comes along to the site
 
-        # The page updates again, now showing both items
+        # Use a new browser session to make sure no info has been cached
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
 
-        # Edith wonders whether the site will remember the list, site generates
-        # a unique URL for the to-do list
+        # Usr2 visits home-page, no sign of usr1's list
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('Use peacock feathers to make fly', page_text)
 
-        # She visits the URL, verifies that the to-do list is still There
+        # Usr2 starts making a new list
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
 
-        # Satisfied she goes back to sleep and closes the browser
+        # Usr2 gets their own unique URL
+        usr2_list_url = self.browser.current_url
+        self.assertRegex(usr2_list_url, '/lists/.+')
+        self.assertNoEqual(usr1_list_url, usr2_list_url)
+
+        # Check again that usr1 list is not present
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('Use peacock feathers to make fly', page_text)
+
+        # Both usrs now leave
         self.browser.quit()
